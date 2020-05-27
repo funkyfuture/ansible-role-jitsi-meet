@@ -27,13 +27,11 @@ server {
     ssl_certificate {{ jitsi_meet_ssl_cert_path }};
     ssl_certificate_key {{ jitsi_meet_ssl_key_path }};
 
-    root /usr/share/jitsi-meet;
-
     # ssi on with javascript for multidomain variables in config.js
     ssi on;
     ssi_types application/x-javascript application/javascript;
 
-    index index.html index.htm;
+    index index.html;
     error_page 404 /static/404.html;
 
     location = /config.js {
@@ -48,16 +46,21 @@ server {
         alias /usr/share/jitsi-meet/libs/external_api.min.js;
     }
 
-    #ensure all static content can always be found first
-    location ~ ^/(libs|css|static|images|fonts|lang|sounds|connection_optimization|.well-known)/(.*)$
-    {
-        add_header 'Access-Control-Allow-Origin' '*';
-        alias /usr/share/jitsi-meet/$1/$2;
+    # static assets and non-config includes
+
+    location @vendor_assets {
+        root /usr/share/jitsi-meet;
     }
 
-    # BOSH
+    location / {
+        root /usr/local/share/jitsi-meet;
+        try_files $uri @vendor_assets;
+    }
+
+    # XMPP BOSH endpoint
+
     location = /http-bind {
-        proxy_pass      http://localhost:5280/http-bind;
+        proxy_pass http://127.0.0.1:5280/http-bind;
         proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header Host $http_host;
     }
@@ -72,12 +75,10 @@ server {
         tcp_nodelay on;
     }
 
-    location ~ ^/([^/?&:'"]+)$ {
-        try_files $uri @root_path;
-    }
+    # rewrite room names to serve index.html
 
-    location @root_path {
-        rewrite ^/(.*)$ / break;
+    location ~ ^/[a-zA-Z0-9]+$ {
+        rewrite ^.*$ / break;
     }
 
 }
