@@ -28,9 +28,9 @@
       value: "{{ jitsi_meet_turn_secret }}"
       vtype: string
 
-- name: Install jitsi-meet
+- name: Install jitsi-meet and its dependencies
   apt:
-    pkg: "{{ jitsi_meet_packages }}"
+    name: jitsi-meet
     install_recommends: no
     state: present
 

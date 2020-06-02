@@ -16,12 +16,6 @@ the various internally used accounts are created.
 
 See [`defaults/main.yml`](defaults/main.yml) for further available variables.
 
-Dependencies
-------------
-
- - [systemli.apt_repositories](https://galaxy.ansible.com/systemli/apt_repositories)
-
-
 Download
 --------
 
