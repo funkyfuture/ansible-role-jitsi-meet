@@ -1,6 +1,8 @@
 server {
     listen 80;
+    {%- if not disable_ipv6 %}
     listen [::]:80;
+    {%- endif %}
     server_name {{ jitsi_meet_server_name }};
 
     location ^~ /.well-known/acme-challenge/ {
@@ -18,7 +20,9 @@ server {
 
     {% set listening_port = "4444" if jitsi_meet_nginx_multiplexer else "443" %}
     listen {{ listening_port }} ssl http2;
+    {%- if not disable_ipv6 %}
     listen [::]:{{ listening_port }} ssl http2;
+    {%- endif %}
 
     server_name {{ jitsi_meet_server_name }};
 
